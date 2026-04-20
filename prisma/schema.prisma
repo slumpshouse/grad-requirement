@@ -1,0 +1,261 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// User model with authentication and gamification fields
+model User {
+  id                    String      @id @default(cuid())
+  email                 String      @unique
+  password              String
+  name                  String
+  selectedLanguage      String      @default("Spanish")
+  dialectPreference     String      @default("latin_america")
+  level                 String      @default("beginner") // beginner, intermediate, advanced
+  xp                    Int         @default(0)
+  streak                Int         @default(0)
+  lastActivityDate      DateTime    @default(now())
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  // Relations
+  quizAttempts          QuizAttempt[]
+  mistakeLogs           MistakeLog[]
+  chatMessages          ChatMessage[]
+  sessions              Session[]
+  verbMasteries         VerbMastery[]
+  achievements          Achievement[]
+
+  @@map("users")
+}
+
+// Session model for NextAuth
+model Session {
+  id                    String      @id @default(cuid())
+  sessionToken          String      @unique
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires               DateTime
+  createdAt             DateTime    @default(now())
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+// Lesson model with content and metadata
+model Lesson {
+  id                    String      @id @default(cuid())
+  title                 String
+  description           String
+  language              String      @default("Spanish")
+  level                 String      // beginner, intermediate, advanced
+  content               String      @db.Text // HTML or markdown content
+  topic                 String      // grammar, vocabulary, conversation, etc.
+  grammarTopic          String?     // present tense, agreement, sentence order
+  conjugationTopic      String?     // comer-present, ser-irregular, etc.
+  sentenceType          String?     // declarative, interrogative, imperative
+  duration              Int         @default(15) // minutes
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  // Relations
+  questions             Question[]
+  sentences             Sentence[]
+
+  @@map("lessons")
+}
+
+model GrammarRule {
+  id                    String      @id @default(cuid())
+  language              String      @default("Spanish")
+  level                 String
+  topic                 String
+  ruleName              String
+  ruleDescription       String      @db.Text
+  examples              String[]
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  questions             Question[]
+
+  @@index([language, level, topic])
+  @@map("grammar_rules")
+}
+
+model VerbConjugation {
+  id                    String      @id @default(cuid())
+  language              String      @default("Spanish")
+  verb                  String
+  tense                 String
+  person                String
+  pronoun               String
+  conjugatedForm        String
+  isIrregular           Boolean     @default(false)
+  difficultyLevel       String      @default("beginner")
+  skillStage            String      @default("present") // base,present,past,future,irregular
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@unique([language, verb, tense, person])
+  @@index([verb, tense])
+  @@map("verb_conjugations")
+}
+
+model VerbMastery {
+  id                    String      @id @default(cuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verb                  String
+  tense                 String
+  masteryScore          Int         @default(0)
+  attempts              Int         @default(0)
+  correctAnswers        Int         @default(0)
+  unlocked              Boolean     @default(false)
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@unique([userId, verb, tense])
+  @@index([userId, masteryScore])
+  @@map("verb_masteries")
+}
+
+model Sentence {
+  id                    String      @id @default(cuid())
+  lessonId              String?
+  lesson                Lesson?     @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  language              String      @default("Spanish")
+  text                  String      @db.Text
+  subjectWord           String?
+  verbWord              String?
+  objectWord            String?
+  conjugationRule       String?
+  breakdown             Json
+  sentenceType          String      @default("declarative")
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  questions             Question[]
+
+  @@index([lessonId])
+  @@index([language, sentenceType])
+  @@map("sentences")
+}
+
+// Question model for quizzes
+model Question {
+  id                    String      @id @default(cuid())
+  lessonId              String
+  lesson                Lesson      @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  sentenceId            String?
+  sentence              Sentence?   @relation(fields: [sentenceId], references: [id], onDelete: SetNull)
+  grammarRuleId         String?
+  grammarRule           GrammarRule? @relation(fields: [grammarRuleId], references: [id], onDelete: SetNull)
+  
+  type                  String      // multiple_choice, fill_blank, translation, listening
+  question              String      @db.Text
+  options               String[]    // JSON array of options for multiple choice
+  correctAnswer         String
+  explanation           String      @db.Text // AI-generated explanation
+  mistakeType           String      // grammar, vocabulary, tense, pronunciation
+  errorType             String?     // grammar_error, conjugation_error, vocabulary_error, sentence_structure_error
+  conjugationVerb       String?
+  conjugationTense      String?
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  // Relations
+  quizAttempts          QuizAttempt[]
+  mistakeLogs           MistakeLog[]
+
+  @@index([lessonId])
+  @@index([sentenceId])
+  @@index([grammarRuleId])
+  @@map("questions")
+}
+
+// Quiz attempt tracking for gamification and analytics
+model QuizAttempt {
+  id                    String      @id @default(cuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  questionId            String
+  question              Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  
+  userAnswer            String
+  isCorrect             Boolean
+  xpGained              Int         @default(0)
+  timeSpent             Int         @default(0) // seconds
+  
+  attemptedAt           DateTime    @default(now())
+
+  @@index([userId])
+  @@index([questionId])
+  @@map("quiz_attempts")
+}
+
+// Mistake log for the AI mistake memory system
+model MistakeLog {
+  id                    String      @id @default(cuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  questionId            String
+  question              Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  
+  mistakeType           String      // grammar, vocabulary, tense, pronunciation
+  errorType             String      @default("grammar_error") // grammar_error, conjugation_error, vocabulary_error, sentence_structure_error
+  incorrectAnswer       String?
+  correctAnswer         String?
+  frequency             Int         @default(1)
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@unique([userId, questionId, mistakeType])
+  @@index([userId])
+  @@index([mistakeType])
+  @@index([errorType])
+  @@map("mistake_logs")
+}
+
+// Chat message model for social learning
+model ChatMessage {
+  id                    String      @id @default(cuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  room                  String      // language-based chat rooms (Spanish, French, etc)
+  levelGroup            String      @default("beginner")
+  message               String      @db.Text
+  suggestedCorrection   String?     @db.Text // AI-suggested grammar corrections
+  
+  createdAt             DateTime    @default(now())
+
+  @@index([userId])
+  @@index([room])
+  @@index([createdAt])
+  @@map("chat_messages")
+}
+
+model Achievement {
+  id                    String      @id @default(cuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code                  String
+  name                  String
+  description           String      @db.Text
+  category              String      // grammar_mastery, conjugation_mastery, streak, boss_battle
+  unlockedAt            DateTime    @default(now())
+
+  @@unique([userId, code])
+  @@index([userId, category])
+  @@map("achievements")
+}
