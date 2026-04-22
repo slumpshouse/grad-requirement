@@ -75,6 +75,20 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit')) || 10;
     const aiEnabled = searchParams.get('ai') !== '0';
+    const requestedLessonId = searchParams.get('lessonId');
+
+    const cookieHeader = request.headers.get('cookie') || '';
+    const cookies = Object.fromEntries(
+      cookieHeader
+        .split(';')
+        .filter(Boolean)
+        .map((c) => {
+          const [key, value] = c.trim().split('=');
+          return [key, value];
+        })
+    );
+
+    const lastLearnedLessonId = requestedLessonId || cookies.lastLearnedLessonId;
 
     const userProfile = await prisma.user.findUnique({
       where: { id: user.id },
@@ -84,10 +98,23 @@ export async function GET(request) {
       },
     });
 
-    // Get personalized questions based on user weakness
-    const questions = await getPersonalizedQuestions(user.id, limit);
+    let questions = [];
 
-    if (aiEnabled && questions.length < limit) {
+    // Prioritize quiz questions from the most recently learned lesson.
+    if (lastLearnedLessonId) {
+      questions = await prisma.question.findMany({
+        where: { lessonId: lastLearnedLessonId },
+        orderBy: { updatedAt: 'desc' },
+        take: limit,
+      });
+    }
+
+    // Fall back to personalized questions when no lesson-specific content exists.
+    if (questions.length === 0) {
+      questions = await getPersonalizedQuestions(user.id, limit);
+    }
+
+    if (aiEnabled && questions.length < limit && !lastLearnedLessonId) {
       const weakAreas = await analyzeUserWeakness(user.id);
       const level = userProfile?.level || 'beginner';
       const language = userProfile?.selectedLanguage || 'Spanish';
@@ -105,7 +132,7 @@ export async function GET(request) {
       }
     }
 
-    return Response.json({ questions });
+    return Response.json({ questions, lessonId: lastLearnedLessonId || null });
   } catch (error) {
     console.error('Error fetching quiz questions:', error);
     return Response.json(

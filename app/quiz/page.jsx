@@ -17,12 +17,26 @@ export default function QuizPage() {
   const [submitted, setSubmitted] = useState(false);
   const [results, setResults] = useState(null);
   const [quizLoading, setQuizLoading] = useState(true);
+  const [lessonContext, setLessonContext] = useState(null);
+  const [requestedLessonId, setRequestedLessonId] = useState(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    setRequestedLessonId(params.get('lessonId'));
+  }, []);
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch('/api/quiz/questions?limit=5');
+      const lessonId = requestedLessonId;
+      const url = lessonId
+        ? `/api/quiz/questions?limit=5&lessonId=${encodeURIComponent(lessonId)}`
+        : '/api/quiz/questions?limit=5';
+
+      const response = await fetch(url);
       const data = await response.json();
       setQuestions(data.questions || []);
+      setLessonContext(data.lessonId || null);
     } catch (error) {
       console.error('Error fetching questions:', error);
     } finally {
@@ -39,10 +53,10 @@ export default function QuizPage() {
 
   // Fetch questions
   useEffect(() => {
-    if (user) {
+    if (user && requestedLessonId !== null) {
       fetchQuestions();
     }
-  }, [user]);
+  }, [user, requestedLessonId]);
 
   const handleAnswerChange = (e) => {
     setUserAnswers({
@@ -162,6 +176,12 @@ export default function QuizPage() {
           </div>
 
           <h2 className="text-2xl font-bold mb-6">{currentQuestion.question}</h2>
+
+          {lessonContext && (
+            <p className="text-sm text-indigo-700 bg-indigo-50 border border-indigo-100 rounded px-3 py-2 mb-4">
+              This quiz is based on your latest learned lesson.
+            </p>
+          )}
 
           <div className="space-y-3 mb-8">
             {currentQuestion.options?.map((option, idx) => (

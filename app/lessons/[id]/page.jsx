@@ -42,6 +42,14 @@ export default function LessonDetailPage() {
     }
   }, [user, fetchLesson]);
 
+  useEffect(() => {
+    if (!lesson?.id || typeof document === 'undefined') {
+      return;
+    }
+
+    document.cookie = `lastLearnedLessonId=${lesson.id}; Path=/; SameSite=Strict; Max-Age=2592000`;
+  }, [lesson?.id]);
+
   const markComplete = async () => {
     if (!lesson) return;
     setCompletionLoading(true);
@@ -121,7 +129,7 @@ export default function LessonDetailPage() {
 
         <div className="flex flex-col md:flex-row gap-3">
           <button
-            onClick={() => router.push('/quiz')}
+            onClick={() => router.push(`/quiz?lessonId=${lesson.id}`)}
             className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700"
           >
             Review This Lesson in Quiz

@@ -21,7 +21,7 @@ export async function POST(request) {
     const streakResult = await updateStreak(user.id);
     const unlockedAchievements = await maybeUnlockMilestones(user.id);
 
-    return Response.json({
+    const response = Response.json({
       lessonId,
       xpAwarded: 10,
       user: {
@@ -31,6 +31,15 @@ export async function POST(request) {
       },
       unlockedAchievements,
     });
+
+    response.headers.append(
+      'Set-Cookie',
+      `lastLearnedLessonId=${lessonId}; Path=/; SameSite=Strict; Max-Age=2592000; ${
+        process.env.NODE_ENV === 'production' ? 'Secure;' : ''
+      }`
+    );
+
+    return response;
   } catch (error) {
     console.error('Error completing lesson:', error);
     return Response.json({ error: 'Failed to complete lesson' }, { status: 500 });
