@@ -14,11 +14,11 @@ export default function BottomBackButton({ fallbackHref = '/', label = 'Back' })
   };
 
   return (
-    <div className="mt-8 flex justify-center">
+    <div className="fixed left-4 top-4 z-50 sm:left-6 sm:top-6">
       <button
         type="button"
         onClick={handleBack}
-        className="px-5 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+        className="rounded-lg border border-gray-300 bg-white px-5 py-2 text-gray-700 shadow-sm transition hover:bg-gray-50"
       >
         {label}
       </button>

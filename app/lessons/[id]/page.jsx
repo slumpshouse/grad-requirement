@@ -83,10 +83,10 @@ export default function LessonDetailPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow">
           <p className="mb-4">Lesson not found.</p>
-          <button onClick={() => router.push('/lessons')} className="px-4 py-2 bg-blue-600 text-white rounded">
-            Back to Lessons
+          <button onClick={() => router.push('/learn')} className="px-4 py-2 bg-blue-600 text-white rounded">
+            Back to Learn
           </button>
-          <BottomBackButton fallbackHref="/lessons" />
+          <BottomBackButton fallbackHref="/learn" />
         </div>
       </div>
     );
@@ -143,7 +143,7 @@ export default function LessonDetailPage() {
           </button>
         </div>
 
-        <BottomBackButton fallbackHref="/lessons" />
+        <BottomBackButton fallbackHref="/learn" />
       </div>
     </div>
   );

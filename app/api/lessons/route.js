@@ -8,6 +8,7 @@ import { prisma } from '@/lib/prisma.js';
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
+    const language = searchParams.get('language');
     const level = searchParams.get('level');
     const topic = searchParams.get('topic');
     const grammarTopic = searchParams.get('grammarTopic');
@@ -15,6 +16,7 @@ export async function GET(request) {
     const sentenceType = searchParams.get('sentenceType');
 
     const where = {};
+    if (language) where.language = language;
     if (level) where.level = level;
     if (topic) where.topic = topic;
     if (grammarTopic) where.grammarTopic = grammarTopic;

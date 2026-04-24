@@ -287,12 +287,7 @@ export default function LearnHubPage() {
                     </button>
                   )}
 
-                  <button
-                    onClick={() => router.push('/lessons')}
-                    className="px-4 py-2 rounded bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                  >
-                    Open Lessons Library
-                  </button>
+
                 </div>
               </div>
             ))}
@@ -310,12 +305,7 @@ export default function LearnHubPage() {
           </ol>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={() => router.push('/lessons')}
-              className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
-            >
-              1. Study Lesson
-            </button>
+
             <button
               onClick={() => router.push('/quiz')}
               className="px-4 py-2 rounded bg-purple-600 text-white hover:bg-purple-700"
