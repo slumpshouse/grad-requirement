@@ -6,7 +6,15 @@ import { prisma } from '@/lib/prisma.js';
  */
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const resolvedParams = await params;
+    const id = resolvedParams?.id;
+
+    if (!id || typeof id !== 'string') {
+      return Response.json(
+        { error: 'Invalid lesson id' },
+        { status: 400 }
+      );
+    }
 
     const lesson = await prisma.lesson.findUnique({
       where: { id },

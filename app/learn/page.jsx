@@ -9,7 +9,6 @@ export default function LearnHubPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const [selectedLayer, setSelectedLayer] = useState('all');
-  const [generatingTopicId, setGeneratingTopicId] = useState(null);
 
   const getStarterWords = (language) => {
     const bank = {
@@ -27,24 +26,9 @@ export default function LearnHubPage() {
     }
   }, [loading, user, router]);
 
-  const handleGenerateTopicLesson = async ({ topic, sentenceType = 'declarative', tense = 'present' }) => {
-    setGeneratingTopicId(topic);
-    try {
-      const response = await fetch('/api/learning/lesson/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, sentenceType, tense }),
-      });
-
-      const data = await response.json();
-      if (response.ok && data?.lesson?.id) {
-        router.push(`/lessons/${data.lesson.id}`);
-      }
-    } catch (error) {
-      console.error('Error generating lesson:', error);
-    } finally {
-      setGeneratingTopicId(null);
-    }
+  const handleStartLesson = ({ topic }) => {
+    const level = selectedLayer === 'all' ? 'beginner' : selectedLayer;
+    router.push(`/lessons?level=${level}&topic=${topic}`);
   };
 
   if (loading) {
@@ -272,18 +256,17 @@ export default function LearnHubPage() {
                 <div className="flex flex-col sm:flex-row gap-3">
                   {topic.lessonConfig ? (
                     <button
-                      onClick={() => handleGenerateTopicLesson(topic.lessonConfig)}
-                      disabled={generatingTopicId === topic.lessonConfig.topic}
-                      className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:bg-slate-400"
+                      onClick={() => handleStartLesson(topic.lessonConfig)}
+                      className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
                     >
-                      {generatingTopicId === topic.lessonConfig.topic ? 'Preparing...' : `Start ${topic.title}`}
+                      {`Start ${topic.title}`}
                     </button>
                   ) : (
                     <button
-                      onClick={() => router.push('/chat')}
-                      className="px-4 py-2 rounded bg-rose-600 text-white hover:bg-rose-700"
+                      onClick={() => handleStartLesson({ topic: topic.id })}
+                      className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
                     >
-                      Explore Context in Chat
+                      {`Start ${topic.title}`}
                     </button>
                   )}
 
