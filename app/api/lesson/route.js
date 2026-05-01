@@ -1,5 +1,6 @@
 import { requireAuth } from '@/lib/middleware.js';
 import { MOCK_LESSONS } from '@/components/lesson/mockData';
+import { enrichLessonPractice } from '@/lib/lesson-practice.js';
 
 const VALID_LEVELS = ['beginner', 'intermediate', 'advanced'];
 
@@ -19,7 +20,7 @@ export async function GET(request) {
   const rawLevel = searchParams.get('level') ?? '';
   const level = VALID_LEVELS.includes(rawLevel) ? rawLevel : 'beginner';
 
-  const lesson = MOCK_LESSONS[level];
+  const lesson = enrichLessonPractice(MOCK_LESSONS[level]);
 
   return Response.json({ lesson });
 }

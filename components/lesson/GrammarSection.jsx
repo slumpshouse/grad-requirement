@@ -1,6 +1,14 @@
 'use client';
 
-export default function GrammarSection({ grammar, level }) {
+const ROLE_STYLES = {
+  subject: 'lp-token lp-token--subject',
+  verb: 'lp-token lp-token--verb',
+  object: 'lp-token lp-token--object',
+  time: 'lp-token lp-token--time',
+  condition: 'lp-token lp-token--condition',
+};
+
+export default function GrammarSection({ grammar, level, example }) {
   const accentMap = {
     beginner: 'lp-badge lp-badge--green',
     intermediate: 'lp-badge lp-badge--yellow',
@@ -21,6 +29,34 @@ export default function GrammarSection({ grammar, level }) {
           </li>
         ))}
       </ul>
+
+      {example && (
+        <div className="lp-grammar__breakdown">
+          <h3 className="lp-grammar__subtitle">Sentence Breakdown</h3>
+          <p className="lp-breakdown__sentence">{example.sentence}</p>
+          <p className="lp-breakdown__translation">{example.translation}</p>
+
+          <div className="lp-breakdown__tokens">
+            {example.breakdown.map((item, i) => (
+              <div
+                key={i}
+                className={ROLE_STYLES[item.role] || 'lp-token'}
+                title={item.label}
+              >
+                <span className="lp-token__word">{item.word}</span>
+                <span className="lp-token__label">{item.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="lp-breakdown__legend">
+            <span className="lp-legend__item lp-legend__item--subject">Subject</span>
+            <span className="lp-legend__item lp-legend__item--verb">Verb</span>
+            <span className="lp-legend__item lp-legend__item--object">Object / Modifier</span>
+            <span className="lp-legend__item lp-legend__item--time">Time / Condition</span>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

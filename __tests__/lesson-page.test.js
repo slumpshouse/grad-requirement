@@ -66,6 +66,8 @@ describe('Mock Lesson Data', () => {
     conjugation.table.forEach((row) => {
       expect(typeof row.pronoun).toBe('string');
       expect(typeof row.form).toBe('string');
+      expect(typeof row.translation).toBe('string');
+      expect(row.translation.length).toBeGreaterThan(0);
     });
   });
 
@@ -228,6 +230,10 @@ describe('Advanced Conjugation Table', () => {
   test('has an imperfect subjunctive table', () => {
     expect(Array.isArray(conjugation.subjunctiveTable)).toBe(true);
     expect(conjugation.subjunctiveTable.length).toBe(6);
+    conjugation.subjunctiveTable.forEach((row) => {
+      expect(typeof row.translation).toBe('string');
+      expect(row.translation.length).toBeGreaterThan(0);
+    });
   });
 
   test('first person conditional form is "comería"', () => {

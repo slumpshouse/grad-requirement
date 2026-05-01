@@ -218,15 +218,58 @@
   gap: 0.25rem;
 }
 
+.lp-vocab__spanish-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 .lp-vocab__spanish {
   font-size: 1.05rem;
   font-weight: 700;
   color: #111827;
 }
 
+.lp-vocab__phonetic {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
 .lp-vocab__english {
   font-size: 0.85rem;
   color: #6b7280;
+}
+
+/* ── Speak Button ─────────────────────────────────────────── */
+.lp-speak-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: #6b7280;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.lp-speak-btn:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+.lp-speak-btn--active {
+  border-color: #6366f1;
+  color: #6366f1;
+  animation: lp-speak-pulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes lp-speak-pulse {
+  from { transform: scale(1); }
+  to   { transform: scale(1.15); }
 }
 
 .lp-vocab__tag {
@@ -366,6 +409,19 @@
 .lp-conj__form {
   font-weight: 700;
   color: #111827;
+  white-space: nowrap;
+}
+
+.lp-conj__form-text {
+  margin-right: 0.35rem;
+}
+
+.lp-conj__speak {
+  vertical-align: middle;
+}
+
+.lp-conj__translation {
+  color: #4b5563;
 }
 
 .lp-conj__note {
@@ -419,6 +475,23 @@
   font-size: 0.95rem;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+}
+
+.lp-practice__option-word {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.lp-practice__phonetic {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
 }
 
 .lp-practice__option:hover:not(:disabled) {
@@ -483,6 +556,13 @@
   margin-top: 0.5rem;
 }
 
+.lp-practice__header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
 .lp-practice__score {
   font-size: 0.88rem;
   font-weight: 600;
@@ -490,6 +570,49 @@
   background: #f3f4f6;
   padding: 0.2rem 0.65rem;
   border-radius: 999px;
+}
+
+/* Show Translations toggle */
+.lp-practice__translate-toggle {
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1.5px solid #d1d5db;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.lp-practice__translate-toggle:hover {
+  background: #f0f9ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+.lp-practice__translate-toggle--on {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+/* Inline word translation hint inside prompt */
+.lp-practice__word-hint {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Translation hint inside an option button */
+.lp-practice__option-hint {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: inherit;
+  opacity: 0.7;
+  margin-left: 0.1rem;
 }
 
 .lp-practice__done {
@@ -539,6 +662,173 @@
   font-weight: 700;
   font-size: 1rem;
   text-align: center;
+}
+
+/* ── AI Explain ───────────────────────────────────────────── */
+.lp-explain {
+  margin-top: 0.85rem;
+}
+
+.lp-explain__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1.5px solid #a78bfa;
+  background: #faf5ff;
+  color: #6d28d9;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.lp-explain__btn:hover:not(:disabled) {
+  background: #ede9fe;
+  border-color: #7c3aed;
+}
+
+.lp-explain__btn--active {
+  background: #ede9fe;
+  border-color: #7c3aed;
+}
+
+.lp-explain__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.lp-explain__spinner {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #a78bfa;
+  border-top-color: #6d28d9;
+  border-radius: 50%;
+  animation: lp-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes lp-spin {
+  to { transform: rotate(360deg); }
+}
+
+.lp-explain__error {
+  font-size: 0.82rem;
+  color: #dc2626;
+  margin-top: 0.4rem;
+}
+
+.lp-explain__retry {
+  background: none;
+  border: none;
+  color: #dc2626;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+}
+
+/* Explanation card */
+.lp-explain__box {
+  margin-top: 0.75rem;
+  border: 1.5px solid #ddd6fe;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.lp-explain__box--fallback {
+  border-color: #fde68a;
+}
+
+.lp-explain__fallback-label {
+  font-size: 0.75rem;
+  color: #92400e;
+  font-weight: 600;
+  background: #fffbeb;
+  padding: 0.4rem 0.9rem;
+  margin: 0;
+  border-bottom: 1px solid #fde68a;
+}
+
+/* Rows */
+.lp-explain__row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.lp-explain__row:last-child {
+  border-bottom: none;
+}
+
+.lp-explain__row-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lp-explain__row-value {
+  font-size: 0.9rem;
+  color: #111827;
+  line-height: 1.5;
+}
+
+/* Row accent colours */
+.lp-explain__row--meaning  { background: #eff6ff; }
+.lp-explain__row--meaning .lp-explain__row-label  { color: #1d4ed8; }
+
+.lp-explain__row--answer   { background: #f0fdf4; }
+.lp-explain__row--answer .lp-explain__row-label   { color: #15803d; }
+
+.lp-explain__row--why      { background: #fff7ed; }
+.lp-explain__row--why .lp-explain__row-label      { color: #c2410c; }
+
+.lp-explain__row--rule     { background: #faf5ff; }
+.lp-explain__row--rule .lp-explain__row-label     { color: #7c3aed; }
+
+.lp-explain__row--forms    { background: #f8fafc; }
+.lp-explain__row--forms .lp-explain__row-label    { color: #475569; }
+
+/* Verb forms list */
+.lp-explain__verb-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.3rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.lp-explain__verb-item {
+  background: #e0e7ff;
+  color: #3730a3;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+/* Tip row */
+.lp-explain__tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  background: #fefce8;
+  font-size: 0.88rem;
+  color: #713f12;
+  font-weight: 500;
+  border-top: 1px solid #fde68a;
+}
+
+.lp-explain__tip-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
 }
 
 /* ── Responsive ───────────────────────────────────────────── */

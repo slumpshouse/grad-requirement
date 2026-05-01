@@ -19,19 +19,32 @@ export default function QuizPage() {
   const [quizLoading, setQuizLoading] = useState(true);
   const [lessonContext, setLessonContext] = useState(null);
   const [requestedLessonId, setRequestedLessonId] = useState(null);
+  const [requestedLevel, setRequestedLevel] = useState('');
+  const [requestedTopic, setRequestedTopic] = useState('');
+  const [queryReady, setQueryReady] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
     setRequestedLessonId(params.get('lessonId'));
+    setRequestedLevel(params.get('level') || '');
+    setRequestedTopic(params.get('topic') || '');
+    setQueryReady(true);
   }, []);
 
   const fetchQuestions = async () => {
     try {
-      const lessonId = requestedLessonId;
-      const url = lessonId
-        ? `/api/quiz/questions?limit=5&lessonId=${encodeURIComponent(lessonId)}`
-        : '/api/quiz/questions?limit=5';
+      const query = new URLSearchParams({ limit: '8' });
+      if (requestedLessonId) {
+        query.set('lessonId', requestedLessonId);
+      } else if (requestedLevel) {
+        query.set('level', requestedLevel);
+        if (requestedTopic) {
+          query.set('topic', requestedTopic);
+        }
+      }
+
+      const url = `/api/quiz/questions?${query.toString()}`;
 
       const response = await fetch(url);
       const data = await response.json();
@@ -53,10 +66,10 @@ export default function QuizPage() {
 
   // Fetch questions
   useEffect(() => {
-    if (user && requestedLessonId !== null) {
+    if (user && queryReady) {
       fetchQuestions();
     }
-  }, [user, requestedLessonId]);
+  }, [user, queryReady]);
 
   const handleAnswerChange = (e) => {
     setUserAnswers({

@@ -1,5 +1,8 @@
 'use client';
 
+import SpeakButton from './SpeakButton';
+import { spanishPhonetic } from '@/lib/spanish-phonetic';
+
 const TYPE_STYLES = {
   pronoun: 'lp-vocab__tag lp-vocab__tag--pronoun',
   verb: 'lp-vocab__tag lp-vocab__tag--verb',
@@ -19,7 +22,11 @@ export default function VocabularySection({ vocabulary }) {
       <div className="lp-vocab__grid">
         {vocabulary.map((item) => (
           <div key={item.spanish} className="lp-vocab__item">
-            <span className="lp-vocab__spanish">{item.spanish}</span>
+            <div className="lp-vocab__spanish-row">
+              <span className="lp-vocab__spanish">{item.spanish}</span>
+              <SpeakButton text={item.spanish} />
+            </div>
+            <span className="lp-vocab__phonetic">{spanishPhonetic(item.spanish)}</span>
             <span className="lp-vocab__english">{item.english}</span>
             <span className={TYPE_STYLES[item.type] || 'lp-vocab__tag'}>{item.type}</span>
           </div>
@@ -28,3 +35,4 @@ export default function VocabularySection({ vocabulary }) {
     </section>
   );
 }
+

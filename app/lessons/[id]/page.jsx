@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/useAuth';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
+
 export default function LessonDetailPage() {
   const params = useParams();
   const router = useRouter();
